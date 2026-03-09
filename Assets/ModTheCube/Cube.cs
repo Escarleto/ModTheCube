@@ -4,20 +4,39 @@ using UnityEngine;
 
 public class Cube : MonoBehaviour
 {
-    public MeshRenderer Renderer;
+    private Vector3 RotationAxis;
+    private float RotationSpeed;
+    private Material Mat;
     
-    void Start()
+    private Color TargetColor;
+    [SerializeField] private float ColorTimer = 0f;
+    [SerializeField] private float ColorInterval = 2f;
+    [SerializeField] private float LerpSpeed = 2f;
+    
+    private void Start()
     {
         transform.position = new Vector3(3, 4, 1);
-        transform.localScale = Vector3.one * 1.3f;
+        transform.localScale = Random.Range(0.5f, 5f) * Vector3.one;
         
-        Material material = Renderer.material;
+        RotationAxis = Random.onUnitSphere;
+        RotationSpeed = Random.Range(20f, 100f);
         
-        material.color = new Color(0.5f, 1.0f, 0.3f, 0.4f);
+        Mat = GetComponent<Renderer>().material;
+        TargetColor = Random.ColorHSV(0f, 1f, 0.5f, 1f, 0.5f, 1f);
+        Mat.color = TargetColor;
     }
     
-    void Update()
+    private void Update()
     {
-        transform.Rotate(10.0f * Time.deltaTime, 0.0f, 0.0f);
+        transform.Rotate(RotationAxis, Time.deltaTime * RotationSpeed);
+        
+        ColorTimer += Time.deltaTime;
+        if (ColorTimer >= ColorInterval)
+        {
+            TargetColor = Random.ColorHSV(0f, 1f, 0.5f, 1f, 0.5f, 1f);
+            ColorTimer = 0f;
+        }
+        
+        Mat.color = Color.Lerp(Mat.color, TargetColor, Time.deltaTime * LerpSpeed);
     }
 }
